@@ -29,13 +29,13 @@ begin
 	end process;
 
 	regwrite <= controls(8);
-	regdst <= controls(7);
-	alusrc <= controls(6);
-	branch <= controls(5);
+	regdst   <= controls(7);
+	alusrc   <= controls(6);
+	branch   <= controls(5);
 	memwrite <= controls(4);
 	memtoreg <= controls(3);
-	jump <= controls(2);
-	aluop <= controls(1 downto 0);
+	jump     <= controls(2);
+	aluop    <= controls(1 downto 0);
 
 end;
 
