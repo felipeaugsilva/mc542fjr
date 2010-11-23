@@ -1,62 +1,58 @@
 library IEEE; use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
 
-entity datapath is — — MIPS datapath
-  port(
-    clk, reset: in STD_LOGIC;
-    memtoreg, pcsrc: in STD_LOGIC;
-    alusrc, regdst: in STD_LOGIC;
-    regwrite, jump: in STD_LOGIC;
-    alucontrol: in STD_LOGIC_VECTOR (2 downto 0);
-    zero: out STD_LOGIC;
-    pc: buffer STD_LOGIC_VECTOR (31 downto 0);
-    instr: in STD_LOGIC_VECTOR(31 downto 0);
-    aluout, writedata: buffer STD_LOGIC_VECTOR (31 downto 0);
-    readdata: in STD_LOGIC_VECTOR(31 downto 0)
-  );
-end;
+Entity datapath is
+  port( clk, reset        : in      STD_LOGIC;
+        memtoreg, pcsrc   : in      STD_LOGIC;
+        alusrc, regdst    : in      STD_LOGIC;
+        regwrite, jump    : in      STD_LOGIC;
+        alucontrol        : in      STD_LOGIC_VECTOR (2 downto 0);
+        zero              : out     STD_LOGIC;
+        pc                : buffer  STD_LOGIC_VECTOR (31 downto 0);
+        instr             : in      STD_LOGIC_VECTOR(31 downto 0);
+        aluout, writedata : buffer  STD_LOGIC_VECTOR (31 downto 0);
+        readdata          : in      STD_LOGIC_VECTOR(31 downto 0));
+End datapath;
 
-architecture struct of datapath is
+Architecture struct of datapath is
 
-  component alu
-    port(
-      a, b: in STD_LOGIC_VECTOR(31 downto 0);
-      alucontrol: in STD_LOGIC_VECTOR(2 downto 0);
-      result: buffer STD_LOGIC_VECTOR(31 downto 0);
-      zero: out STD_LOGIC
-    );
-  end component;
+  Component ALU is
+    Generic(W : natural = 32; Cw: natural 3);
+    port( SrcA        : in  std_logic_vector(W-1 downto 0);
+          SrcB        : in  std_logic_vector(W-1 downto 0);
+          AluControl  : in  std_logic_vector(Cw-1 downto 0);
+          AluResult   : out std_logic_vector(W-1 downto 0);
+          Zero        : out std_logic;
+          Overflow    : out std_logic
+          CarryOut    : out std_logic);
+  End Component ALU;
 
-  component regfile
-    port(
-      clk: in STD_LOGIC;
-      we3: in STD_LOGIC;
-      ra1, ra2, wa3: in STD_LOGIC_VECTOR (4 downto 0);
-      wd3: in STD_LOGIC_VECTOR (31 downto 0);
-      rd1, rd2: out STD_LOGIC_VECTOR (31 downto 0)
-    );
-  end component;
+  Component RF is
+    Generic(W : natural = 32);
+    port( A1  : in  std_logic_vector(4 downto 0);
+          A2  : in  std_logic_vector(4 downto 0);
+          A3  : in  std_logic_vector(4 downto 0);
+          WD3 : in  std_logic_vector(W-1 downto 0);
+          clk : in  std_logic;
+          We3 : in  std_logic;
+          RD1 : out std_logic_vector(W-1 downto 0);
+          RD2 : out std_logic_vector(W-1 downto 0));
+  End Component RF;
 
   component adder
-    port(
-      a, b: in STD_LOGIC_VECTOR (31 downto 0);
-      y: out STD_LOGIC_VECTOR (31 downto 0)
-    );
-  end component;
+    port( a, b: in STD_LOGIC_VECTOR (31 downto 0);
+          y   : out STD_LOGIC_VECTOR (31 downto 0));
+  end component adder;
 
   component sl2
-    port(
-      a: in STD_LOGIC_VECTOR (31 downto 0);
-      y: out STD_LOGIC_VECTOR (31 downto 0)
-    );
-  end component;
+    port( a: in   STD_LOGIC_VECTOR (31 downto 0);
+          y: out  STD_LOGIC_VECTOR (31 downto 0));
+  end component sl2;
 
   component signext
-    port(
-      a: in STD_LOGIC_VECTOR (15 downto 0);
-      y: out STD_LOGIC_VECTOR (31 downto 0)
-    );
-  end component;
+    port( a: in   STD_LOGIC_VECTOR (15 downto 0);
+          y: out  STD_LOGIC_VECTOR (31 downto 0));
+  end component signext;
 
   component flopr generic (width: integer);
     port(
