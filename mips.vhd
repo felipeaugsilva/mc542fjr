@@ -2,19 +2,23 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 
-entity
-  generic(nbits : positive := 32);
-  port(Instruction : in std_logic_vector(nbits-1 downto 0);
-     Data        : in std_logic_vector(nbits-1 downto 0);
-     clk         : in std_logic;
-     reset       : in std_logic;
-     PCF         : out std_logic_vector(nbits-1 downto 0);
-     ALUOutM     : out std_logic_vector(nbits-1 downto 0);
-     WriteDataM  : out std_logic_vector(nbits-1 downto 0);
-     MemWriteM   : out std_logic);
-end mips;
+Entity mips is
+  generic(
+    nbits : positive := 32
+  );
+  port(
+    Instruction : in  std_logic_vector(nbits -1 downto 0);
+    Data        : in  std_logic_vector(nbits -1 downto 0);
+    clk         : in  std_logic;
+    reset       : in  std_logic;
+    PCF         : out std_logic_vector(nbits -1 downto 0);
+    ALUOutM     : out std_logic_vector(nbits -1 downto 0));
+    WriteDataM  : out std_logic_vector(nbits -1 downto 0);
+    MemWriteM   : out std_logic
+  );
+End mips;
 
-architecture behaviour of mips id
+Architecture Behaviour of mips is
 
   Component RF
     Generic(
@@ -71,4 +75,4 @@ architecture behaviour of mips id
     R: RF port map (A1, A2, A3, WD3, clk, We3, RD1, RD2);
     A: ALU port map (SrcA, SrcB, AluControl, AluResult, Zero, Overflow, CarryOut);
 
-end behaviour;
+End Behaviour;
