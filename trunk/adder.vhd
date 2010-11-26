@@ -1,10 +1,11 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
-use IEEE.STD_LOGIC_UNSIGNED.all;
+-- use IEEE.STD_LOGIC_UNSIGNED.all;   // UNSIGNED????? - verificar
 
 entity adder is -- adder
-    port (a, b: in  STD_LOGIC_VECTOR(31 downto 0);
-          y:    out STD_LOGIC_VECTOR(31 downto 0));
+    generic (W: integer := 32);
+    port (a, b: in  STD_LOGIC_VECTOR(W-1 downto 0);
+          y:    out STD_LOGIC_VECTOR(W-1 downto 0));
 end;
 
 architecture behave of adder is
