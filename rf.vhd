@@ -4,15 +4,15 @@ use ieee.numeric_std.all;
 use ieee.std_logic_unsigned.all;
 
 Entity RF is
- Generic(W : natural := 4);
+ Generic(W : natural);
  port(A1       : in std_logic_vector(4 downto 0);
       A2       : in std_logic_vector(4 downto 0);
       A3       : in std_logic_vector(4 downto 0);
-      WD3      : in std_logic_vector(4 downto 0);
+      WD3      : in std_logic_vector(W-1 downto 0);
       clk      : in std_logic;
       We3      : in std_logic;
-      RD1      : out std_logic_vector(4 downto 0);
-      RD2      : out std_logic_vector(4 downto 0));
+      RD1      : out std_logic_vector(W-1 downto 0);
+      RD2      : out std_logic_vector(W-1 downto 0));
 End RF;
 
 architecture behaviour of RF is
