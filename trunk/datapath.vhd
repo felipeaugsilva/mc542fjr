@@ -6,10 +6,11 @@ Entity datapath is
   port (clk, reset: in    STD_LOGIC;
         PCF:        inout STD_LOGIC_VECTOR(31 downto 0);  
         instr:      in    STD_LOGIC_VECTOR(31 downto 0); 
-        WriteRegW: in STD_LOGIC_VECTOR(4 downto 0);
-        ResultW, RegWriteW: in    STD_LOGIC;
+        WriteRegW: in     STD_LOGIC_VECTOR(4 downto 0);
+        ResultW :  in     STD_LOGIC_VECTOR(31 downto 0); 
+        RegWriteW: in     STD_LOGIC;
         --AluOutM: in STD_LOGIC_VECTOR(31 downto 0); 
-        SaidaFlopD: out STD_LOGIC_VECTOR(115 downto 0); 
+        SaidaFlopD: out STD_LOGIC_VECTOR(115 downto 0)); 
 End datapath;
 
 
@@ -41,7 +42,7 @@ Architecture struct of datapath is
 
     component equal generic (W: integer);
         port (a, b: in  STD_LOGIC_VECTOR(W-1 downto 0);
-              y:    out STD_LOGIC_VECTOR);
+              y:    out STD_LOGIC);
     end component;
 
     component RF generic (W: natural);

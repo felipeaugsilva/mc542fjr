@@ -24,6 +24,7 @@ begin
 			when "000100" => controls <= "000100001"; -- BEQ
 			when "001000" => controls <= "101000000"; -- ADDI
 			when "000010" => controls <= "000000100"; -- J
+            --when "000011" => controls <= ""; -- Jal
 			when others   => controls <= "---------"; -- operacao ilegal
 		end case;
 	end process;
