@@ -1,47 +1,47 @@
+-- MC542 - Exercicio 02: Banco de Registradores
+-- Felipe Augusto da Silva   RA 096993   12/11/2010
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use ieee.std_logic_unsigned.all;
 
-Entity RF is
- Generic(W : natural);
- port(A1       : in std_logic_vector(4 downto 0);
-      A2       : in std_logic_vector(4 downto 0);
-      A3       : in std_logic_vector(4 downto 0);
-      WD3      : in std_logic_vector(W-1 downto 0);
-      clk      : in std_logic;
-      We3      : in std_logic;
-      RD1      : out std_logic_vector(W-1 downto 0);
-      RD2      : out std_logic_vector(W-1 downto 0));
-End RF;
+entity RF is
+    generic(W: natural := 32);
+    port (A1 : in std_logic_vector(4 downto 0);
+          A2 : in std_logic_vector(4 downto 0);
+          A3 : in std_logic_vector(4 downto 0);
+          WD3: in std_logic_vector(W-1 downto 0);
+          clk: in std_logic;
+          We3: in std_logic;
+          RD1: out std_logic_vector(W-1 downto 0);
+          RD2: out std_logic_vector(W-1 downto 0));
+end RF;
 
-architecture behaviour of RF is
+architecture behavior of RF is
 
-  type vetregs is array (4 downto 0) of STD_LOGIC_VECTOR (4 downto 0);
-  signal regs: vetregs;
+    -- Banco de registradores: 32 registradores de W-1 bits cada
+    type registradores is array (0 to 31) of std_logic_vector(W-1 downto 0);
 
 begin
-  
 
-  -- escrita sincrona
-  process(clk) begin
-    if clk'event and clk = '1' then
-      if We3 = '1' then regs(CONV_INTEGER(A3)) <= WD3;
-      end if;
-    end if;
-  end process;
+    process(clk, A1, A2)
 
-  -- leitura assincrona
-  process (A1, A2) begin
+    variable reg: registradores;
 
-    if (CONV_INTEGER(A1) = 0) then RD1 <= (others => '0'); -- registrador 0 contem zero
-    else RD1 <= regs(CONV_INTEGER (A1));
-    end if;
+    begin
 
-    if (CONV_INTEGER(A2) = 0) then RD2 <= (others => '0'); -- registrador 0 contem zero
-    else RD2 <= regs(CONV_INTEGER(A2));
-    end if;
+        reg(0) := (others => '0');      -- Registrador 0 eh sempre zero
 
-  end process;
-end;
+        if clk' event and clk = '1' and We3 = '1' then      -- Escreve
+            if to_integer(unsigned(A3)) /= 0 then           -- Nao permite escrita no reg 0
+                reg(to_integer(unsigned(A3))) := WD3;
+            end if;
+        end if;
+
+        RD1 <= reg(to_integer(unsigned(A1)));
+        RD2 <= reg(to_integer(unsigned(A2)));
+
+    end process;
+
+end behavior;
 
