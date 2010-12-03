@@ -3,16 +3,13 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
 
 Entity datapath is
-  port( clk, reset: in    STD_LOGIC;
-        --pcsrcD:     in    STD_LOGIC;     
-        --pcbranchD:  in    STD_LOGIC_VECTOR(31 downto 0); 
+  port (clk, reset: in    STD_LOGIC;
         PCF:        inout STD_LOGIC_VECTOR(31 downto 0);  
         instr:      in    STD_LOGIC_VECTOR(31 downto 0); 
-        --saidaFlopF: out   STD_LOGIC_VECTOR (63 downto 0));
         WriteRegW: in STD_LOGIC_VECTOR(4 downto 0);
         ResultW, RegWriteW: in    STD_LOGIC;
-        AluOutM: in STD_LOGIC_VECTOR(31 downto 0); 
-        SaidaFlopD: out STD_LOGIC_VECTOR(117 downto 0); 
+        --AluOutM: in STD_LOGIC_VECTOR(31 downto 0); 
+        SaidaFlopD: out STD_LOGIC_VECTOR(115 downto 0); 
 End datapath;
 
 
@@ -21,12 +18,12 @@ Architecture struct of datapath is
 
 
     component adder generic (width: integer);
-        port( a, b: in  STD_LOGIC_VECTOR (31 downto 0);
+        port (a, b: in  STD_LOGIC_VECTOR (31 downto 0);
               y   : out STD_LOGIC_VECTOR (31 downto 0));
     end component adder;
 
     component flopr generic (width: integer);
-        port( clk, reset: in  STD_LOGIC;
+        port (clk, reset: in  STD_LOGIC;
               d:          in  STD_LOGIC_VECTOR (width-1 downto 0);
               q:          out STD_LOGIC_VECTOR (width-1 downto 0));
     end component;
@@ -38,7 +35,7 @@ Architecture struct of datapath is
     end component;
 
     component signimm 
-        port( a: in  STD_LOGIC_VECTOR (15 downto 0);
+        port (a: in  STD_LOGIC_VECTOR (15 downto 0);
               y: out STD_LOGIC_VECTOR (31 downto 0));
     end component;
 
@@ -68,14 +65,14 @@ Architecture struct of datapath is
           RegWriteD:   out STD_LOGIC;
           MemtoRegD:   out STD_LOGIC; 
           MemWriteD:   out STD_LOGIC;
-          ALUControlD: out STD_LOGIC_VECTOR (2 downto 0));
+          ALUControlD: out STD_LOGIC_VECTOR (2 downto 0);
           ALUSrcD:     out STD_LOGIC;
           RegDstD:     out STD_LOGIC;
           BranchD:     out STD_LOGIC;
           Jump:        out STD_LOGIC);
     end component;
 
-    signal pc, PCPlus4F: STD_LOGIC_VECTOR (31 downto 0);
+    signal PC, PCPlus4F: STD_LOGIC_VECTOR (31 downto 0);
     signal regFetch, saidaFlopF : STD_LOGIC_VECTOR (63 downto 0);
     signal PCBranchD:     STD_LOGIC_VECTOR(31 downto 0); 
     signal InstrD, PCPlus4D: STD_LOGIC_VECTOR(31 downto 0); 
@@ -87,7 +84,7 @@ Architecture struct of datapath is
     signal RegWriteD: STD_LOGIC;
     signal MemtoRegD:    STD_LOGIC; 
     signal MemWriteD:    STD_LOGIC;
-    signal ALUControlD:  STD_LOGIC_VECTOR (2 downto 0));
+    signal ALUControlD:  STD_LOGIC_VECTOR (2 downto 0);
     signal ALUSrcD:      STD_LOGIC;
     signal RegDstD:      STD_LOGIC;
     signal BranchD:      STD_LOGIC;
@@ -98,25 +95,25 @@ Architecture struct of datapath is
 
 begin
 
--- Fetch -----------------------------------------------------------
+-- Fetch -------------------------------------------------------------------------
 
-    mux2F:   mux2  generic map (32) port map (PCPlus4F, PCBranchD, PCSrcD, pc);
+    mux2F:   mux2  generic map (32) port map (PCPlus4F, PCBranchD, PCSrcD, PC);
 
     adderF:  adder generic map (32) port map (PCF, X"00000004", PCPlus4F);
 
-    floprPC: flopr generic map (32) port map (clk, reset, pc, PCF);
+    floprPC: flopr generic map (32) port map (clk, reset, PC, PCF);
 
     regFetch <= instr & PCPlus4F;
 
     floprF:  flopr generic map (64) port map (clk, reset, regFetch, saidaFlopF);
 
-------------------------------------------------------------------------------------
+-- Decode -------------------------------------------------------------------------
 
     InstrD <= saidaFlopF(31 downto 0);
     PCPlus4D <= saidaFlopF(63 downto 32);
 
     rfD: rf generic map (32) port map (InstrD(25 downto 21), InstrD(20 downto 16), WriteRegW,
-                                       ResultW, clk, We3, RD1, RD2).
+                                       ResultW, clk, RegWriteW, RD1, RD2);
 
     RtD <= InstrD(20 downto 16);
     RdD <= InstrD(15 downto 11);
@@ -139,6 +136,11 @@ begin
     regDecode <= RegWriteD & MemtoRegD & MemWriteD & ALUControlD & ALUSrcD & RegDstD & BranchD & Jump
                  & RD1 & RD2 & RtD & RdD & SignImmD;
 
+
+
+
+
+-- Execute -------------------------------------------------------------------------
 
 end;
 

@@ -6,7 +6,7 @@ entity controller is -- control decoder
           RegWriteD:   out STD_LOGIC;
           MemtoRegD:   out STD_LOGIC; 
           MemWriteD:   out STD_LOGIC;
-          ALUControlD: out STD_LOGIC_VECTOR (2 downto 0));
+          ALUControlD: out STD_LOGIC_VECTOR (2 downto 0);
           ALUSrcD:     out STD_LOGIC;
           RegDstD:     out STD_LOGIC;
           BranchD:     out STD_LOGIC;
