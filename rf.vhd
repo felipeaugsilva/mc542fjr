@@ -6,7 +6,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity RF is
-    generic(W: natural := 32);
+    generic(W: natural);
     port (A1 : in std_logic_vector(4 downto 0);
           A2 : in std_logic_vector(4 downto 0);
           A3 : in std_logic_vector(4 downto 0);
