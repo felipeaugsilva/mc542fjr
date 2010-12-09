@@ -110,8 +110,8 @@ begin
 
 -- Decode -------------------------------------------------------------------------
 
-    InstrD <= saidaFlopF(31 downto 0);
-    PCPlus4D <= saidaFlopF(63 downto 32);
+    InstrD <= saidaFlopF(63 downto 32);
+    PCPlus4D <= saidaFlopF(31 downto 0);
 
     rfD: rf generic map (32) port map (InstrD(25 downto 21), InstrD(20 downto 16), WriteRegW,
                                        ResultW, clk, RegWriteW, RD1, RD2);
