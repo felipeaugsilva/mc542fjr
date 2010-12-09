@@ -10,7 +10,8 @@ entity controller is -- control decoder
           ALUSrcD:     out STD_LOGIC;
           RegDstD:     out STD_LOGIC;
           BranchD:     out STD_LOGIC;
-          Jump:        out STD_LOGIC);
+          Jump:        out STD_LOGIC;
+          jal:         out STD_LOGIC);
 end;
 
 architecture struct of controller is
@@ -21,7 +22,8 @@ architecture struct of controller is
           branch, alusrc:     out STD_LOGIC;
           regdst, regwrite:   out STD_LOGIC;
           jump:               out STD_LOGIC;
-          aluop:              out STD_LOGIC_VECTOR (1 downto 0));
+          aluop:              out STD_LOGIC_VECTOR (1 downto 0);
+          jal:                out STD_LOGIC);
     end component;
 
     component aludec
@@ -34,7 +36,7 @@ architecture struct of controller is
 
 begin
 
-    md: maindec port map (Op, MemtoRegD, MemWriteD, BranchD, ALUSrcD, RegDstD, RegWriteD, Jump, ALUOp);
+    md: maindec port map (Op, MemtoRegD, MemWriteD, BranchD, ALUSrcD, RegDstD, RegWriteD, Jump, ALUOp, jal);
     ad: aludec  port map (Funct, ALUOp, ALUControlD);
 
 end;

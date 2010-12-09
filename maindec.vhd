@@ -7,28 +7,30 @@ entity maindec is  -- main control decoder
 		  branch, alusrc:     out STD_LOGIC;
 		  regdst, regwrite:   out STD_LOGIC;
 		  jump:               out STD_LOGIC;
-		  aluop:              out STD_LOGIC_VECTOR (1 downto 0));
+		  aluop:              out STD_LOGIC_VECTOR (1 downto 0);
+          jal:                out STD_LOGIC);
 end;
 
 architecture behave of maindec is
 
-	signal controls: STD_LOGIC_VECTOR(8 downto 0);
+	signal controls: STD_LOGIC_VECTOR(9 downto 0);
 
 begin
 	process(op) begin
 
 		case op is
-			when "000000" => controls <= "110000010"; -- R-type
-			when "100011" => controls <= "101001000"; -- LW
-			when "101011" => controls <= "001010000"; -- SW
-			when "000100" => controls <= "000100001"; -- BEQ
-			when "001000" => controls <= "101000000"; -- ADDI
-			when "000010" => controls <= "000000100"; -- J
-            --when "000011" => controls <= ""; -- Jal
-			when others   => controls <= "---------"; -- operacao ilegal
+			when "000000" => controls <= "0110000010"; -- R-type
+			when "100011" => controls <= "0101001000"; -- LW
+			when "101011" => controls <= "0001010000"; -- SW
+			when "000100" => controls <= "0000100001"; -- BEQ
+			when "001000" => controls <= "0101000000"; -- ADDI
+			when "000010" => controls <= "0000000100"; -- J
+            when "000011" => controls <= "1100000100"; -- Jal
+			when others   => controls <= "----------"; -- operacao ilegal
 		end case;
 	end process;
 
+    jal      <= controls(9);
 	regwrite <= controls(8);
 	regdst   <= controls(7);
 	alusrc   <= controls(6);

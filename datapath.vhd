@@ -69,12 +69,12 @@ Architecture struct of datapath is
           ALUSrcD:     out STD_LOGIC;
           RegDstD:     out STD_LOGIC;
           BranchD:     out STD_LOGIC;
-          Jump:        out STD_LOGIC);
+          Jump:        out STD_LOGIC;
+          jal:         out STD_LOGIC);
     end component;
 
     component ALU
-    generic(W : natural := 32;
-            Cw: natural := 3);
+    generic(W : natural := 32);
     port(SrcA      : in  std_logic_vector(W-1  downto 0);
          SrcB      : in  std_logic_vector(W-1  downto 0);
          AluControl: in  std_logic_vector(2 downto 0);
@@ -135,7 +135,11 @@ Architecture struct of datapath is
     --concatena o shift
     signal shiftj        : STD_LOGIC_VECTOR(27 downto 0);
 
-    signal resetFloprF  :STD_LOGIC;
+    signal resetFloprF  : STD_LOGIC;
+
+    signal mux2D1s      : STD_LOGIC_VECTOR(4 downto 0);
+    signal mux2D2s      : STD_LOGIC_VECTOR(31 downto 0);
+    signal jal          : STD_LOGIC;
 
 
 begin
@@ -167,8 +171,12 @@ begin
     InstrD <= saidaFlopF(63 downto 32);
     PCPlus4D <= saidaFlopF(31 downto 0);
 
-    rfD: rf generic map (32) port map (InstrD(25 downto 21), InstrD(20 downto 16), WriteRegW,
-                                       ResultW, clk, RegWriteW, RD1, RD2);
+    mux2D1:   mux2  generic map (5) port map (WriteRegW, "11111", jal, mux2D1s);
+    
+    mux2D2:   mux2  generic map (32) port map (ResultW, PCPlus4D, jal, mux2D2s);
+
+    rfD: rf generic map (32) port map (InstrD(25 downto 21), InstrD(20 downto 16), mux2D1s,
+                                       mux2D2s, clk, RegWriteW, RD1, RD2);
 
     RtD <= InstrD(20 downto 16);
     RdD <= InstrD(15 downto 11);
@@ -184,7 +192,7 @@ begin
     floprD:  flopr generic map (115) port map (clk, reset, regDecode, SaidaFlopD);
 
     contr: controller port map (InstrD(31 downto 26), InstrD(5 downto 0), RegWriteD, MemtoRegD, MemWriteD,
-                                ALUControlD, ALUSrcD, RegDstD, BranchD, Jump);
+                                ALUControlD, ALUSrcD, RegDstD, BranchD, Jump, jal);
 
     PCSrcD <= BranchD and equalD;
 
