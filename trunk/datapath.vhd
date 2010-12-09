@@ -10,7 +10,8 @@ Entity datapath is
         ResultW :  in     STD_LOGIC_VECTOR(31 downto 0); 
         RegWriteW: in     STD_LOGIC;
         --AluOutM: in STD_LOGIC_VECTOR(31 downto 0); 
-        SaidaFlopD: out STD_LOGIC_VECTOR(115 downto 0)); 
+        --SaidaFlopD: out STD_LOGIC_VECTOR(115 downto 0)); 
+        SaidaFlopE: out STD_LOGIC_VECTOR(71 downto 0)); 
 End datapath;
 
 
@@ -73,15 +74,27 @@ Architecture struct of datapath is
           Jump:        out STD_LOGIC);
     end component;
 
+    component ALU
+    generic(W : natural := 32;
+            Cw: natural := 3);
+    port(SrcA      : in  std_logic_vector(W-1  downto 0);
+         SrcB      : in  std_logic_vector(W-1  downto 0);
+         AluControl: in  std_logic_vector(2 downto 0);
+         AluResult : out std_logic_vector(W-1  downto 0);
+         Zero      : out std_logic;
+         Overflow  : out std_logic;
+         CarryOut  : out std_logic);
+    end component;
+
     signal PC, PCPlus4F: STD_LOGIC_VECTOR (31 downto 0);
     signal regFetch, saidaFlopF : STD_LOGIC_VECTOR (63 downto 0);
     signal PCBranchD:     STD_LOGIC_VECTOR(31 downto 0); 
     signal InstrD, PCPlus4D: STD_LOGIC_VECTOR(31 downto 0); 
     signal RD1, RD2, SignImmD:     STD_LOGIC_VECTOR(31 downto 0); 
-    signal RtD, RdD: STD_LOGIC_VECTOR(4 downto 0); 
+    signal RtD, RdD, RtE, RdE: STD_LOGIC_VECTOR(4 downto 0); 
     signal shiftOut: STD_LOGIC_VECTOR(31 downto 0); 
     signal equalD: STD_LOGIC; 
-    signal regDecode: STD_LOGIC_VECTOR(115 downto 0); 
+    signal regDecode: STD_LOGIC_VECTOR(114 downto 0); 
     signal RegWriteD: STD_LOGIC;
     signal MemtoRegD:    STD_LOGIC; 
     signal MemWriteD:    STD_LOGIC;
@@ -91,6 +104,19 @@ Architecture struct of datapath is
     signal BranchD:      STD_LOGIC;
     signal Jump:         STD_LOGIC;
     signal PCSrcD:       STD_LOGIC;     
+    signal SaidaFlopD:  STD_LOGIC_VECTOR(114 downto 0);
+    signal RegWriteE: STD_LOGIC;
+    signal MemtoRegE:    STD_LOGIC; 
+    signal MemWriteE:    STD_LOGIC;
+    signal ALUControlE:  STD_LOGIC_VECTOR (2 downto 0);
+    signal ALUSrcE:      STD_LOGIC;
+    signal RegDstE:      STD_LOGIC;
+    signal SrcAE, SrcBE, SrcB:  STD_LOGIC_VECTOR(31 downto 0); 
+    signal WriteDataE:  STD_LOGIC_VECTOR(31 downto 0); 
+    signal WriteRegE : STD_LOGIC_VECTOR(4 downto 0); 
+    signal SignImmE: STD_LOGIC_VECTOR(31 downto 0); 
+    signal AluResult: STD_LOGIC_VECTOR(31 downto 0); 
+    signal regExecute: STD_LOGIC_VECTOR(71 downto 0); 
 
 
 
@@ -127,21 +153,45 @@ begin
 
     equalD0:  equal generic map (32) port map (RD1, RD2, equalD);
 
-    floprD:  flopr generic map (116) port map (clk, reset, regDecode, SaidaFlopD);
+    floprD:  flopr generic map (115) port map (clk, reset, regDecode, SaidaFlopD);
 
     contr: controller port map (InstrD(31 downto 26), InstrD(5 downto 0), RegWriteD, MemtoRegD, MemWriteD,
                                 ALUControlD, ALUSrcD, RegDstD, BranchD, Jump);
 
     PCSrcD <= BranchD and equalD;
 
-    regDecode <= RegWriteD & MemtoRegD & MemWriteD & ALUControlD & ALUSrcD & RegDstD & BranchD & Jump
+    regDecode <= RegWriteD & MemtoRegD & MemWriteD & ALUControlD & ALUSrcD & RegDstD & BranchD
                  & RD1 & RD2 & RtD & RdD & SignImmD;
 
-
-
-
-
 -- Execute -------------------------------------------------------------------------
+
+    mux2E1:   mux2  generic map (5) port map (RtE, RdE, RegDstE, WriteRegE);
+
+    mux2E2:   mux2  generic map (32) port map (SrcB, SignImmE, ALUSrcE, SrcBE);
+
+    ALUE: ALU port map (SrcAE, SrcBE, ALUControlE, AluResult);
+
+    floprE:  flopr generic map (72) port map (clk, reset, regExecute, SaidaFlopE);
+
+    regWriteE <= SaidaFlopD(114);
+    MemtoRegE <= SaidaFlopD(113);
+    MemWriteE <= SaidaFlopD(112);
+    ALUControlE <= SaidaFlopD(111 downto 109);
+    ALUSrcE <= SaidaFlopD(108);
+    RegDstE <= SaidaFlopD(107);
+    SrcAE <= SaidaFlopD(105 downto 74);
+    SrcB <= SaidaFlopD(73 downto 42);
+    RtE <= SaidaFlopD(41 downto 37);
+    RdE <= SaidaFlopD(36 downto 32);
+    SignImmE <= SaidaFlopD(31 downto 0);
+    WriteDataE <= SrcB;
+
+    regExecute <= regWriteE & MemtoRegE & MemWriteE & AluResult & WriteDataE & WriteRegE;
+
+    
+
+
+-- Memory -------------------------------------------------------------------------
 
 end;
 
