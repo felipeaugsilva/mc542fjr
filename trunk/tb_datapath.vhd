@@ -66,8 +66,13 @@ End component;
             --instr <= "100011" & "01000" & "01001" & "0000000000100000"; -- lw
                     --x"AD310004" after 100 ns, -- sw
             --wait for 100 ns;
-            instr <= "000100" & "00011" & "00100" & "0000000000100000"; -- beq com valores iguais
+            instr <= "000100" & "00011" & "00011" & "0000000000100000"; -- beq com valores iguais
             wait for 100 ns;
+
+            instr <= "000100" & "00011" & "00011" & "0000000000000000"; -- beq com valores iguais
+            wait for 100 ns;
+
+            instr <= "100011" & "01000" & "01001" & "0000000000100000";
             
             wait;    
         end process;
