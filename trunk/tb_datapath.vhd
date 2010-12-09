@@ -46,8 +46,8 @@ End component;
         process 
         begin
         --Seta valores aos registradores
-            wait for 100 ns;
-            reset <= '0';
+            --wait for 100 ns;
+            instr <= "000100" & "00001" & "00010" & "0000000000100000"; -- beq com valores diferentes
             RegWriteW <= '1';
             for i in 0 to 31 loop
               ResultW <= std_logic_vector(to_unsigned(i, 32));
@@ -58,17 +58,17 @@ End component;
             WriteRegW  <= std_logic_vector(to_unsigned(4, 5));
             RegWriteW <= '0';
             --wait;
-
+            reset <= '0';
             --wait for 3300 ns;
             -- Clock
             --clk <= not clk after 50 ns;      
 
-            instr <= "100011" & "01000" & "01001" & "0000000000100000"; -- lw
+            --instr <= "100011" & "01000" & "01001" & "0000000000100000"; -- lw
                     --x"AD310004" after 100 ns, -- sw
-            wait for 100 ns;
+            --wait for 100 ns;
             instr <= "000100" & "00011" & "00100" & "0000000000100000"; -- beq com valores iguais
             wait for 100 ns;
-            instr <= "000100" & "00001" & "00010" & "0000000000100000"; -- beq com valores diferentes
+            
             wait;    
         end process;
 
