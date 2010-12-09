@@ -1,3 +1,7 @@
+rm *.o
+rm work-obj93.cf
+rm tb_datapath
+rm datapath.vcd
 ghdl -a --ieee=synopsys -fexplicit adder.vhd
 ghdl -a --ieee=synopsys -fexplicit flopr.vhd
 ghdl -a --ieee=synopsys -fexplicit mux2.vhd
