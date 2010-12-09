@@ -6,12 +6,9 @@ Entity datapath is
   port (clk, reset: in    STD_LOGIC;
         PCF:        inout STD_LOGIC_VECTOR(31 downto 0);  
         instr:      in    STD_LOGIC_VECTOR(31 downto 0); 
-        WriteRegW: in     STD_LOGIC_VECTOR(4 downto 0);
-        ResultW :  in     STD_LOGIC_VECTOR(31 downto 0); 
-        RegWriteW: in     STD_LOGIC;
-        --AluOutM: in STD_LOGIC_VECTOR(31 downto 0); 
-        --SaidaFlopD: out STD_LOGIC_VECTOR(115 downto 0)); 
-        SaidaFlopE: out STD_LOGIC_VECTOR(71 downto 0)); 
+        Data:  in  STD_LOGIC_VECTOR(31 downto 0); 
+        WriteDataM : out STD_LOGIC_VECTOR(31 downto 0); 
+        MemWriteM:  out STD_LOGIC);
 End datapath;
 
 
@@ -58,8 +55,9 @@ Architecture struct of datapath is
     end component;
 
     component sl2
-        port (a: in  STD_LOGIC_VECTOR (31 downto 0);
-              y: out STD_LOGIC_VECTOR (31 downto 0));
+          generic (W: integer);
+          port (a: in  STD_LOGIC_VECTOR (W-1 downto 0);
+          y: out STD_LOGIC_VECTOR (W-1 downto 0));
     end component;
 
     component controller
@@ -102,7 +100,6 @@ Architecture struct of datapath is
     signal ALUSrcD:      STD_LOGIC;
     signal RegDstD:      STD_LOGIC;
     signal BranchD:      STD_LOGIC;
-    signal Jump:         STD_LOGIC;
     signal PCSrcD:       STD_LOGIC;     
     signal SaidaFlopD:  STD_LOGIC_VECTOR(114 downto 0);
     signal RegWriteE: STD_LOGIC;
@@ -117,14 +114,42 @@ Architecture struct of datapath is
     signal SignImmE: STD_LOGIC_VECTOR(31 downto 0); 
     signal AluResult: STD_LOGIC_VECTOR(31 downto 0); 
     signal regExecute: STD_LOGIC_VECTOR(71 downto 0); 
+    signal SaidaFlopE:  STD_LOGIC_VECTOR(71 downto 0);
+    signal regMemory:  STD_LOGIC_VECTOR(70 downto 0);
+    signal RegWriteM: STD_LOGIC;
+    signal MemtoRegM:  STD_LOGIC;
+    signal ALUOutM: STD_LOGIC_VECTOR(31 downto 0); 
+    signal WriteRegM: STD_LOGIC_VECTOR(4 downto 0); 
+    signal RegWriteW:STD_LOGIC;
+    signal MemtoRegW:STD_LOGIC;
+    signal ReadDataW:STD_LOGIC_VECTOR(31 downto 0); 
+    signal ALUOutW:STD_LOGIC_VECTOR(31 downto 0); 
+    signal WriteRegW: STD_LOGIC_VECTOR(4 downto 0); 
+    signal SaidaFlopM: STD_LOGIC_VECTOR(70 downto 0);
+    signal ResultW: STD_LOGIC_VECTOR(31 downto 0);
+    --Jump
+    signal Jump         : STD_LOGIC;
+    signal PCX          : STD_LOGIC_VECTOR(31 downto 0);
+    signal PCJump       : STD_LOGIC_VECTOR(27 downto 0);
+    signal PCJumpFinal  : STD_LOGIC_VECTOR(31 downto 0);
+    --concatena o shift
+    signal shiftj        : STD_LOGIC_VECTOR(27 downto 0);
 
+    signal resetFloprF  :STD_LOGIC;
 
 
 begin
 
 -- Fetch -------------------------------------------------------------------------
 
-    mux2F:   mux2  generic map (32) port map (PCPlus4F, PCBranchD, PCSrcD, PC);
+    mux2F1:   mux2  generic map (32) port map (PCPlus4F, PCBranchD, PCSrcD, PCX);
+
+    --Jump
+    PCJumpFinal <= PCPlus4F(31 downto 28) & PCJump;
+    mux2F2:   mux2  generic map (32) port map (PCX, PCJumpFinal, Jump, PC);
+    --Jump
+    shiftj <= "00" & InstrD(25 downto 0);
+    ShiftJump: sl2 generic map (28) port map ( shiftj, PCJump);
 
     adderF:  adder generic map (32) port map (PCF, X"00000004", PCPlus4F);
 
@@ -132,7 +157,10 @@ begin
 
     regFetch <= instr & PCPlus4F;
 
-    floprF:  flopr generic map (64) port map (clk, reset, regFetch, saidaFlopF);
+    floprF:  flopr generic map (64) port map (clk, resetFloprF, regFetch, saidaFlopF);
+
+    --stall
+    resetFloprF <= reset or PCSrcD; --or Jump;
 
 -- Decode -------------------------------------------------------------------------
 
@@ -147,7 +175,7 @@ begin
 
     signExt: signimm port map (InstrD(15 downto 0), SignImmD);
 
-    shift: sl2 port map (SignImmD, shiftOut);
+    shift: sl2 generic map (32) port map (SignImmD, shiftOut);
 
     adderD:  adder generic map (32) port map (shiftOut, PCPlus4D, PCBranchD);
 
@@ -188,10 +216,29 @@ begin
 
     regExecute <= regWriteE & MemtoRegE & MemWriteE & AluResult & WriteDataE & WriteRegE;
 
-    
-
-
 -- Memory -------------------------------------------------------------------------
+
+    floprM:  flopr generic map (71) port map (clk, reset, regMemory, SaidaFlopM);
+
+    RegWriteM <= SaidaFlopE(71);
+    MemtoRegM <= SaidaFlopE(70);
+    MemWriteM <= SaidaFlopE(69);
+    ALUOutM <= SaidaFlopE(68 downto 37);
+    WriteDataM <= SaidaFlopE(36 downto 5);
+    WriteRegM <= SaidaFlopE(4 downto 0);
+
+    regMemory <= RegWriteM & MemtoRegM & Data & ALUOutM & WriteRegM;
+
+-- Writeback -------------------------------------------------------------------------
+
+    mux2W:   mux2  generic map (32) port map (ALUOutW, ReadDataW, MemtoRegW, ResultW);
+
+    RegWriteW <= SaidaFlopM(70);
+    MemtoRegW <= SaidaFlopM(69);
+    ReadDataW <= SaidaFlopM(68 downto 37);
+    ALUOutW <= SaidaFlopM(36 downto 5);
+    WriteRegW <= SaidaFlopM(4 downto 0);
+
 
 end;
 
