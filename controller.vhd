@@ -6,7 +6,7 @@ entity controller is -- control decoder
           RegWriteD:   out STD_LOGIC;
           MemtoRegD:   out STD_LOGIC; 
           MemWriteD:   out STD_LOGIC;
-          ALUControlD: out STD_LOGIC_VECTOR (2 downto 0);
+          ALUControlD: out STD_LOGIC_VECTOR (3 downto 0);
           ALUSrcD:     out STD_LOGIC;
           RegDstD:     out STD_LOGIC;
           BranchD:     out STD_LOGIC;
@@ -29,7 +29,7 @@ architecture struct of controller is
     component aludec
         port (funct:      in  STD_LOGIC_VECTOR (5 downto 0);
               aluop:      in  STD_LOGIC_VECTOR (1 downto 0);
-              alucontrol: out STD_LOGIC_VECTOR (2 downto 0));
+              alucontrol: out STD_LOGIC_VECTOR (3 downto 0));
     end component;
 
     signal ALUOp: STD_LOGIC_VECTOR (1 downto 0);
