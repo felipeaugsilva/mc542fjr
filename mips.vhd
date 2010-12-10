@@ -1,3 +1,10 @@
+-- MC542 - Projeto: MIPS pipelined      Data: 10/12/2010
+
+-- Jesse de Moura Tavano Moretto  RA: 081704
+-- Felipe Augusto da Silva        RA: 096993
+-- Rodrigo Augusto Folegatti      RA: 097085
+
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 

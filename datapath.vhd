@@ -136,13 +136,13 @@ architecture struct of datapath is
 
 begin
 
--- Fetch -------------------------------------------------------------------------
+-- Fetch --------------------------------------------------------------------------
 
     mux2F1:   mux2 generic map (32) port map (PCPlus4F, PCBranchD, PCSrcD, PCX);
 
     mux2F2:   mux2 generic map (32) port map (PCX, PCJumpFinal, Jump, PC);
     
-    ShiftJump: sl2 generic map (28) port map ( shiftj, PCJump);
+    ShiftJump: sl2 generic map (28) port map (shiftj, PCJump);
 
     adderF:  adder generic map (32) port map (sigPCF, X"00000004", PCPlus4F);
 
@@ -219,7 +219,7 @@ begin
     regExecute <= JalE & PCPlus4E & regWriteE & MemtoRegE & MemWriteE & AluResult & WriteDataE & WriteRegE;
 
 
--- Memory -------------------------------------------------------------------------
+-- Memory ---------------------------------------------------------------------------
 
     floprM:  flopr generic map (104) port map (clk, reset, regMemory, SaidaFlopM);
 
@@ -250,7 +250,6 @@ begin
     ReadDataW    <= SaidaFlopM(68 downto 37);
     ALUOutW      <= SaidaFlopM(36 downto 5);
     WriteRegWAux <= SaidaFlopM(4  downto 0);
-
 
 end;
 

@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
-entity mux2 is --two-input multiplexer
+entity mux2 is -- two-input multiplexer
     generic (width: integer);
     port (d0, d1: in  STD_LOGIC_VECTOR(width-1 downto 0);
           s:      in  STD_LOGIC;

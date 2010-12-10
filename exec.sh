@@ -17,6 +17,5 @@ ghdl -a --ieee=synopsys -fexplicit datapath.vhd
 ghdl -a --ieee=synopsys -fexplicit mips.vhd
 ghdl -a --ieee=synopsys -fexplicit tb_controle.vhd
 ghdl -e --ieee=synopsys -fexplicit tb_controle
-ghdl -e --ieee=synopsys -fexplicit tb_controle
 ghdl -r tb_controle --vcd=controle.vcd
 gtkwave controle.vcd &

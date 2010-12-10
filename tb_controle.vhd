@@ -2,8 +2,10 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+
 entity tb_controle is
 end tb_controle;
+
 
 architecture behavior of tb_controle is
 
@@ -66,43 +68,43 @@ begin
         Instruction <= "100011" & "00000" & "00011" & "0000000000000000"; -- lw em r3
 
         wait for 10 ns;
-        Data <= X"00000001";
+        Data <= X"00000001"; -- load 1
         Instruction <= "100011" & "00000" & "00100" & "0000000000000000"; -- lw em r4
 
         wait for 10 ns;
-        Data <= X"00000002";
+        Data <= X"00000002"; -- load 2
         Instruction <= "100011" & "00000" & "00101" & "0000000000000000"; -- lw em r5
 
         wait for 10 ns;
-        Data <= X"00000003";
+        Data <= X"00000003"; -- load 3
         Instruction <= "100011" & "00000" & "00110" & "0000000000000000"; -- lw em r6
 
         wait for 10 ns;
-        Data <= X"00000004";
+        Data <= X"00000004"; -- load 4
         Instruction <= "100011" & "00000" & "00111" & "0000000000000000"; -- lw em r7
 
         wait for 10 ns;
-        Data <= X"00000005";
+        Data <= X"00000005"; -- load 5
         Instruction <= "100011" & "00000" & "01000" & "0000000000000000"; -- lw em r8
 
         wait for 10 ns;
-        Data <= X"00000006";
+        Data <= X"00000006"; -- load 6
         Instruction <= "100011" & "00000" & "01001" & "0000000000000000"; -- lw em r9
 
         wait for 10 ns;
-        Data <= X"00000007";
+        Data <= X"00000007"; -- load 7
         Instruction <= "100011" & "00000" & "01010" & "0000000000000000"; -- lw em r10
 
         wait for 10 ns;
-        Data <= X"00000008";
+        Data <= X"00000008"; -- load 8
         Instruction <= "000000" & "00001" & "00010" & "01011" & "00000" & "100000"; -- add r11, r1, r2
 
         wait for 10 ns;
-        Data <= X"00000009";
+        Data <= X"00000009"; -- load 9
         Instruction <= "000000" & "00011" & "00100" & "01100" & "00000" & "100010"; -- sub r12, r3, r4
 
         wait for 10 ns;
-        Data <= X"0000000A";
+        Data <= X"0000000A"; -- load 10
         Instruction <= "001000" & "00101" & "01101" & "0000000000001000"; -- addi r13, r5, 8
 
         wait for 10 ns;
@@ -177,16 +179,20 @@ begin
         Data <= X"0000000F"; -- load 17
         Instruction <= "100011" & "00000" & "10100" & "0000000000000000"; -- lw em r20
 
+        --nop
         wait for 10 ns;
         Data <= X"00000010"; -- load 18
-        Instruction <= "000000" & "01111" & "10000" & "10101" & "00000" & "100001"; -- addu r21, r15, r16
+        Instruction <= "001000" & "00000" & "00000" & "0000000000000000"; -- addi r0, r0, 0
 
         wait for 10 ns;
         Data <= X"00000000"; -- load 19
-        Instruction <= "000000" & "10001" & "10010" & "10110" & "00000" & "100011"; -- subu r22, r17, r18
+        Instruction <= "000000" & "01111" & "10000" & "10101" & "00000" & "100001"; -- addu r21, r15, r16
 
         wait for 10 ns;
         Data <= X"FFFFFFFF"; -- load 20
+        Instruction <= "000000" & "10001" & "10010" & "10110" & "00000" & "100011"; -- subu r22, r17, r18
+
+        wait for 10 ns;
         Instruction <= "000000" & "10011" & "10100" & "10111" & "00000" & "101011"; -- sltu r23, r19, r20
 
         --nop
@@ -251,7 +257,6 @@ begin
         --nop
         wait for 10 ns;
         Instruction <= "001000" & "00000" & "00000" & "0000000000000000"; -- addi r0, r0, 0
-
 
         wait;
 
