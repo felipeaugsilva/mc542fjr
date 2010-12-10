@@ -2,87 +2,102 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
 
-Entity datapath is
-  port (clk, reset: in    STD_LOGIC;
-        PCF:        inout STD_LOGIC_VECTOR(31 downto 0);  
-        instr:      in    STD_LOGIC_VECTOR(31 downto 0); 
-        Data:  in  STD_LOGIC_VECTOR(31 downto 0); 
-        WriteDataM : out STD_LOGIC_VECTOR(31 downto 0); 
-        MemWriteM:  out STD_LOGIC);
-End datapath;
+
+entity datapath is
+    port (clk         : in    std_logic;
+          reset       : in    std_logic;
+          instr       : in    std_logic_vector(31 downto 0);
+          Data        : in    std_logic_vector(31 downto 0);
+          PCF         : out std_logic_vector(31 downto 0);
+          ALUOutM     : out std_logic_vector(31 downto 0);
+          WriteDataM  : out   std_logic_vector(31 downto 0);
+          MemWriteM   : out   std_logic);
+end datapath;
 
 
-Architecture struct of datapath is
+architecture struct of datapath is
 
-
-
-    component adder generic (width: integer);
+    component adder
+        generic (width: integer);
         port (a, b: in  STD_LOGIC_VECTOR (31 downto 0);
               y   : out STD_LOGIC_VECTOR (31 downto 0));
     end component adder;
 
-    component flopr generic (width: integer);
+
+    component flopr
+        generic (width: integer);
         port (clk, reset: in  STD_LOGIC;
               d:          in  STD_LOGIC_VECTOR (width-1 downto 0);
               q:          out STD_LOGIC_VECTOR (width-1 downto 0));
     end component;
 
-    component mux2 generic (width: integer);
+
+    component mux2
+        generic (width: integer);
         port (d0, d1: in  STD_LOGIC_VECTOR (width-1 downto 0);
               s:      in  STD_LOGIC;
               y:      out STD_LOGIC_VECTOR (width-1 downto 0));
     end component;
+
 
     component signimm 
         port (a: in  STD_LOGIC_VECTOR (15 downto 0);
               y: out STD_LOGIC_VECTOR (31 downto 0));
     end component;
 
-    component equal generic (W: integer);
+
+    component equal
+        generic (W: integer);
         port (a, b: in  STD_LOGIC_VECTOR(W-1 downto 0);
               y:    out STD_LOGIC);
     end component;
 
-    component RF generic (W: natural);
-        port (A1       : in std_logic_vector(4 downto 0);
-              A2       : in std_logic_vector(4 downto 0);
-              A3       : in std_logic_vector(4 downto 0);
-              WD3      : in std_logic_vector(W-1 downto 0);
-              clk      : in std_logic;
-              We3      : in std_logic;
-              RD1      : out std_logic_vector(W-1 downto 0);
-              RD2      : out std_logic_vector(W-1 downto 0));
+
+    component RF
+        generic (W: natural);
+        port (A1  : in  std_logic_vector(4 downto 0);
+              A2  : in  std_logic_vector(4 downto 0);
+              A3  : in  std_logic_vector(4 downto 0);
+              WD3 : in  std_logic_vector(W-1 downto 0);
+              clk : in  std_logic;
+              We3 : in  std_logic;
+              RD1 : out std_logic_vector(W-1 downto 0);
+              RD2 : out std_logic_vector(W-1 downto 0));
     end component;
+
 
     component sl2
-          generic (W: integer);
-          port (a: in  STD_LOGIC_VECTOR (W-1 downto 0);
-          y: out STD_LOGIC_VECTOR (W-1 downto 0));
+        generic (W: integer);
+        port (a: in  STD_LOGIC_VECTOR (W-1 downto 0);
+              y: out STD_LOGIC_VECTOR (W-1 downto 0));
     end component;
 
-    component controller
-    port (Op, Funct:   in  STD_LOGIC_VECTOR (5 downto 0);
-          RegWriteD:   out STD_LOGIC;
-          MemtoRegD:   out STD_LOGIC; 
-          MemWriteD:   out STD_LOGIC;
-          ALUControlD: out STD_LOGIC_VECTOR (2 downto 0);
-          ALUSrcD:     out STD_LOGIC;
-          RegDstD:     out STD_LOGIC;
-          BranchD:     out STD_LOGIC;
-          Jump:        out STD_LOGIC;
-          jal:         out STD_LOGIC);
-    end component;
 
     component ALU
-    generic(W : natural := 32);
-    port(SrcA      : in  std_logic_vector(W-1  downto 0);
-         SrcB      : in  std_logic_vector(W-1  downto 0);
-         AluControl: in  std_logic_vector(2 downto 0);
-         AluResult : out std_logic_vector(W-1  downto 0);
-         Zero      : out std_logic;
-         Overflow  : out std_logic;
-         CarryOut  : out std_logic);
+        generic (W : natural := 32);
+        port (SrcA      : in  std_logic_vector(W-1  downto 0);
+              SrcB      : in  std_logic_vector(W-1  downto 0);
+              AluControl: in  std_logic_vector(2 downto 0);
+              AluResult : out std_logic_vector(W-1  downto 0);
+              Zero      : out std_logic;
+              Overflow  : out std_logic;
+              CarryOut  : out std_logic);
     end component;
+
+
+    component controller
+        port (Op, Funct:   in  STD_LOGIC_VECTOR (5 downto 0);
+              RegWriteD:   out STD_LOGIC;
+              MemtoRegD:   out STD_LOGIC; 
+              MemWriteD:   out STD_LOGIC;
+              ALUControlD: out STD_LOGIC_VECTOR (2 downto 0);
+              ALUSrcD:     out STD_LOGIC;
+              RegDstD:     out STD_LOGIC;
+              BranchD:     out STD_LOGIC;
+              Jump:        out STD_LOGIC;
+              Jal:         out STD_LOGIC);
+    end component;
+
 
     signal PC, PCPlus4F: STD_LOGIC_VECTOR (31 downto 0);
     signal regFetch, saidaFlopF : STD_LOGIC_VECTOR (63 downto 0);
@@ -118,7 +133,7 @@ Architecture struct of datapath is
     signal regMemory:  STD_LOGIC_VECTOR(70 downto 0);
     signal RegWriteM: STD_LOGIC;
     signal MemtoRegM:  STD_LOGIC;
-    signal ALUOutM: STD_LOGIC_VECTOR(31 downto 0); 
+    --signal ALUOutM: STD_LOGIC_VECTOR(31 downto 0); 
     signal WriteRegM: STD_LOGIC_VECTOR(4 downto 0); 
     signal RegWriteW:STD_LOGIC;
     signal MemtoRegW:STD_LOGIC;
@@ -132,7 +147,7 @@ Architecture struct of datapath is
     signal PCX          : STD_LOGIC_VECTOR(31 downto 0);
     signal PCJump       : STD_LOGIC_VECTOR(27 downto 0);
     signal PCJumpFinal  : STD_LOGIC_VECTOR(31 downto 0);
-    --concatena o shift
+   -- concatena o shift
     signal shiftj        : STD_LOGIC_VECTOR(27 downto 0);
 
     signal resetFloprF  : STD_LOGIC;
@@ -141,6 +156,7 @@ Architecture struct of datapath is
     signal mux2D2s      : STD_LOGIC_VECTOR(31 downto 0);
     signal jal          : STD_LOGIC;
 
+    signal sigPCF :  STD_LOGIC_VECTOR(31 downto 0);
 
 begin
 
@@ -155,9 +171,11 @@ begin
     shiftj <= "00" & InstrD(25 downto 0);
     ShiftJump: sl2 generic map (28) port map ( shiftj, PCJump);
 
-    adderF:  adder generic map (32) port map (PCF, X"00000004", PCPlus4F);
+    adderF:  adder generic map (32) port map (sigPCF, X"00000004", PCPlus4F);
 
-    floprPC: flopr generic map (32) port map (clk, reset, PC, PCF);
+    PCF <= sigPCF;
+
+    floprPC: flopr generic map (32) port map (clk, reset, PC, sigPCF);
 
     regFetch <= instr & PCPlus4F;
 
@@ -235,7 +253,7 @@ begin
     WriteDataM <= SaidaFlopE(36 downto 5);
     WriteRegM <= SaidaFlopE(4 downto 0);
 
-    regMemory <= RegWriteM & MemtoRegM & Data & ALUOutM & WriteRegM;
+    regMemory <= RegWriteM & MemtoRegM & Data & SaidaFlopE(68 downto 37) & WriteRegM;
 
 -- Writeback -------------------------------------------------------------------------
 
@@ -249,11 +267,4 @@ begin
 
 
 end;
-
-
-
-
-
-
-
 
