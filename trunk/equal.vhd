@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
-entity equal is -- 
+entity equal is
     generic (W: integer);
     port (a, b: in  STD_LOGIC_VECTOR(W-1 downto 0);
           y:    out STD_LOGIC);
