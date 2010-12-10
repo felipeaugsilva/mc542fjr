@@ -131,10 +131,7 @@ architecture struct of datapath is
     signal ALUSrcD, ALUSrcE        : STD_LOGIC;
     signal RegDstD, RegDstE        : STD_LOGIC;
     signal Jump                    : STD_LOGIC;
-
     signal JalD, JalE, JalM, JalW  : STD_LOGIC;
-
-    --signal resetFloprF  : STD_LOGIC;
 
 
 begin
@@ -161,9 +158,6 @@ begin
     PCF <= sigPCF;
 
     regFetch <= instr & PCPlus4F;
-
-    --stall
-    --resetFloprF <= reset or PCSrcD; --or Jump;
 
 
 -- Decode -------------------------------------------------------------------------

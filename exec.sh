@@ -1,7 +1,5 @@
 rm *.o
 rm work-obj93.cf
-rm tb_datapath
-rm datapath.vcd
 rm tb_controle
 rm controle.vcd
 ghdl -a --ieee=synopsys -fexplicit alu.vhd
