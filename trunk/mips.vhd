@@ -33,14 +33,14 @@ architecture struct of mips is
 
 
     component datapath
-        port (clk         : in    std_logic;
-              reset       : in    std_logic;
-              instr       : in    std_logic_vector(31 downto 0);
-              Data        : in    std_logic_vector(31 downto 0);
+        port (clk         : in  std_logic;
+              reset       : in  std_logic;
+              instr       : in  std_logic_vector(31 downto 0);
+              Data        : in  std_logic_vector(31 downto 0);
               PCF         : out std_logic_vector(31 downto 0);
               ALUOutM     : out std_logic_vector(31 downto 0);
-              WriteDataM  : out   std_logic_vector(31 downto 0);
-              MemWriteM   : out   std_logic);
+              WriteDataM  : out std_logic_vector(31 downto 0);
+              MemWriteM   : out std_logic);
     end component;
 
 

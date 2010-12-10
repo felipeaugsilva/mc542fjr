@@ -54,7 +54,48 @@ begin
     process 
     begin
 
-        Instruction <= "001000" & "00000" & "00000" & "0000000000000000"; -- addi 0
+        Instruction <= "001000" & "00000" & "00000" & "0000000000000000"; -- addi r0, r0, 0
+
+        wait for 15 ns;
+        Data <= X"0000FFFF";
+        Instruction <= "100011" & "00000" & "00001" & "0000000000000000"; -- lw em r1
+
+        --wait for 10 ns;
+        --Instruction <= "001000" & "00000" & "00000" & "0000000000000000"; -- addi r0, r0, 0
+
+        wait for 10 ns;
+        Data <= X"CCCC0000";
+        Instruction <= "100011" & "00000" & "00010" & "0000000000000000"; -- lw em r2
+
+        wait for 10 ns;
+        Data <= X"00000001";
+        Instruction <= "100011" & "00000" & "00011" & "0000000000000000"; -- lw em r3
+
+        wait for 10 ns;
+        Data <= X"00000010";
+        Instruction <= "100011" & "00000" & "00100" & "0000000000000000"; -- lw em r4
+
+        wait for 10 ns;
+        Instruction <= "001000" & "00000" & "00101" & "0000000000000001"; -- addi r5, r0, 1
+
+        wait for 10 ns;
+        Instruction <= "000000" & "00000" & "00001" & "00110" & "00000" & "100101"; -- or r6, r0, r1
+
+        wait for 10 ns;
+        Instruction <= "000000" & "00001" & "00010" & "00111" & "00000" & "100101"; -- or r7, r1, r2
+
+        wait for 10 ns;
+        Instruction <= "000011" & "00000000000000001111111111"; --jal
+
+        wait for 10 ns;
+        Instruction <= "001000" & "00000" & "00000" & "0000000000000000"; -- addi r0, r0, 0
+
+        wait for 40 ns;
+
+        Instruction <= "101011" & "00000" & "11111" & "0000000000000000"; -- sw
+
+        wait for 10 ns;
+        Instruction <= "001000" & "00000" & "00000" & "0000000000000000";
 
         wait;
 

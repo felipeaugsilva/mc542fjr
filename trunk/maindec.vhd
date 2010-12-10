@@ -24,6 +24,7 @@ begin
 			when "101011" => controls <= "0001010000"; -- SW
 			when "000100" => controls <= "0000100001"; -- BEQ
 			when "001000" => controls <= "0101000000"; -- ADDI
+            when "111010" => controls <= "0101000001"; -- SUBI
 			when "000010" => controls <= "0000000100"; -- J
             when "000011" => controls <= "1100000100"; -- Jal
 			when others   => controls <= "----------"; -- operacao ilegal
